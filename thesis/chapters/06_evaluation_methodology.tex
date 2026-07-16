@@ -1,0 +1,100 @@
+\chapter{Evaluation Methodology}
+\label{ch:evaluation-methodology}
+
+Every system in this project is judged from four different angles: whether the output reads as simpler, whether it overlaps with a human-written reference, whether it performs well on a metric built specifically for simplification, and whether it still means what the source sentence meant. No single metric covers all four questions, which is precisely why all of them are reported together rather than any one being treated as decisive. A manual reading of individual outputs, reported in \cref{ch:results-discussion}, is treated as a fifth and equally important check on all four.
+
+\section{Readability Metrics}
+\label{sec:readability-metrics}
+
+Readability formulas estimate how difficult a passage is to read from surface features such as sentence length and syllable count. They say nothing about accuracy, but they are a fast, standard way to check whether an output looks simpler at all.
+
+\subsection*{Flesch Reading Ease}
+
+\begin{equation}
+    \label{eq:flesch-reading-ease}
+    FRE = 206.835 - 1.015 \left( \frac{\text{total words}}{\text{total sentences}} \right) - 84.6 \left( \frac{\text{total syllables}}{\text{total words}} \right)
+\end{equation}
+
+Scores range roughly from 0 to 100, with higher values indicating easier reading.
+
+\subsection*{Flesch-Kincaid Grade Level}
+
+\begin{equation}
+    \label{eq:flesch-kincaid}
+    FKGL = 0.39 \left( \frac{\text{total words}}{\text{total sentences}} \right) + 11.8 \left( \frac{\text{total syllables}}{\text{total words}} \right) - 15.59
+\end{equation}
+
+This approximates the US school grade level a reader would need to follow the text without difficulty.
+
+\subsection*{SMOG Index}
+
+\begin{equation}
+    \label{eq:smog}
+    SMOG = 1.0430 \sqrt{\text{polysyllable count} \times \dfrac{30}{\text{number of sentences}}} + 3.1291
+\end{equation}
+
+SMOG estimates the years of education needed to fully understand a passage, based on the number of words with three or more syllables.
+
+\section{Overlap-Based Metrics}
+\label{sec:overlap-metrics}
+
+\subsection*{BLEU}
+
+BLEU was originally designed for machine translation and measures $n$-gram overlap between a candidate and one or more references, adjusted by a brevity penalty that discourages overly short outputs~\cite{papineni2002bleu}.
+
+\begin{equation}
+    \label{eq:bleu}
+    BLEU = BP \cdot \exp \left( \sum_{n=1}^{N} w_n \log p_n \right), \qquad BP = \min \left( 1,\ e^{1 - r/c} \right)
+\end{equation}
+
+Here $p_n$ is the modified $n$-gram precision, $w_n$ the weight assigned to that $n$-gram order, $r$ the reference length, and $c$ the candidate length.
+
+\subsection*{ROUGE-N}
+
+ROUGE measures recall-oriented $n$-gram overlap and is commonly used to check how much of a reference's content survives in a candidate text~\cite{lin2004rouge}.
+
+\begin{equation}
+    \label{eq:rouge}
+    ROUGE\text{-}N = \frac{\displaystyle\sum_{S \in \text{Refs}} \sum_{\text{gram}_n \in S} \text{Count}_{\text{match}}(\text{gram}_n)}{\displaystyle\sum_{S \in \text{Refs}} \sum_{\text{gram}_n \in S} \text{Count}(\text{gram}_n)}
+\end{equation}
+
+This project reports ROUGE-1, ROUGE-2, and ROUGE-L, corresponding to unigram overlap, bigram overlap, and longest common subsequence overlap respectively.
+
+\section{A Simplification-Specific Metric: SARI}
+\label{sec:sari-metric}
+
+BLEU and ROUGE were both built for tasks where staying close to the reference is the goal. Simplification is different, since a good rewrite is expected to remove some content and reword the rest, which a translation-style metric can penalise unfairly. SARI addresses this directly by scoring how well a system adds, keeps, and deletes $n$-grams relative to the source and the reference, rather than simply measuring overlap~\cite{xu2016sari}.
+
+\begin{equation}
+    \label{eq:sari}
+    SARI = \frac{1}{3} \left( F_{\text{add}} + F_{\text{keep}} + P_{\text{delete}} \right)
+\end{equation}
+
+where $F_{\text{add}}$ and $F_{\text{keep}}$ are $n$-gram-level F1 scores for words correctly added and correctly retained, and $P_{\text{delete}}$ is the precision of words correctly removed, each averaged over $n$-gram orders one to four.
+
+\section{Meaning Preservation: BERTScore}
+\label{sec:bertscore-metric}
+
+None of the metrics above can confirm that a simplified sentence still means what the source sentence meant. BERTScore addresses this by comparing candidate and reference text using contextual embeddings rather than exact word matches, so a paraphrase that uses different words can still score well if its meaning is close to the reference~\cite{zhang2020bertscore}.
+
+\begin{equation}
+    \label{eq:bertscore-p}
+    P_{\text{BERT}} = \frac{1}{|\hat{x}|} \sum_{\hat{x}_j \in \hat{x}} \max_{x_i \in x} \mathbf{x}_i^{\top} \hat{\mathbf{x}}_j
+\end{equation}
+
+\begin{equation}
+    \label{eq:bertscore-r}
+    R_{\text{BERT}} = \frac{1}{|x|} \sum_{x_i \in x} \max_{\hat{x}_j \in \hat{x}} \mathbf{x}_i^{\top} \hat{\mathbf{x}}_j
+\end{equation}
+
+\begin{equation}
+    \label{eq:bertscore-f1}
+    F_{\text{BERT}} = 2 \cdot \frac{P_{\text{BERT}} \cdot R_{\text{BERT}}}{P_{\text{BERT}} + R_{\text{BERT}}}
+\end{equation}
+
+Here $x$ and $\hat{x}$ denote the token embeddings of the reference and candidate sentence respectively. This project reports BERTScore using \texttt{distilbert-base-uncased} as the underlying embedding model, a lighter alternative to the \texttt{roberta-large} model used in the original BERTScore paper, chosen to keep evaluation practical on the hardware available for this project.
+
+\section{Qualitative Analysis}
+\label{sec:qualitative-approach}
+
+Automatic metrics are treated in this project as a starting point rather than a verdict. A manual reading of individual test examples was carried out alongside the automatic scores, chosen to represent a strong case, a neutral case, and a weak case for the fine-tuned model, using SARI and BERTScore as an initial filter before reading the actual text. This reading looks specifically for whether meaning was preserved, whether clinically relevant detail was lost, whether the output was simplified past the point of usefulness, and whether an output that scored well numerically actually reads as more natural or clear. \Cref{ch:results-discussion} reports what this reading found alongside the aggregate numbers.

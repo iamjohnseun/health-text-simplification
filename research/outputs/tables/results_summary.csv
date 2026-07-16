@@ -1,0 +1,6 @@
+,flesch_reading_ease,flesch_kincaid_grade,smog_index,bleu,rouge1,rouge2,rougeL,sari,bertscore_precision,bertscore_recall,bertscore_f1
+Source (no simplification),26.717,14.547,15.333,29.592,0.553,0.38,0.497,51.941,0.876,0.889,0.881
+Reference (human lay summary),30.138,14.668,15.309,,,,,,,,
+Heuristic baseline,29.526,14.039,14.844,28.393,0.542,0.37,0.486,48.767,0.874,0.888,0.879
+Zero-shot T5-small,20.063,15.844,16.122,19.309,0.366,0.223,0.327,36.29,0.763,0.815,0.787
+Fine-tuned T5-small,24.516,15.101,15.787,29.807,0.561,0.384,0.505,50.495,0.885,0.888,0.885

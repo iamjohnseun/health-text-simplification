@@ -1,0 +1,83 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+% ----------------------------------------------------------------------
+% Packages
+% ----------------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\usepackage[nameinref]{cleveref}
+
+% ----------------------------------------------------------------------
+% Layout
+% ----------------------------------------------------------------------
+\onehalfspacing
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\nouppercase{\leftmark}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ----------------------------------------------------------------------
+% Title page details -- edit these for your submission
+% ----------------------------------------------------------------------
+\newcommand{\thesistitle}{Automatic Plain-Language Simplification of Public-Facing Health Information Using Transformer-Based NLP}
+\newcommand{\thesisauthor}{Nnamdi Salau-John}
+\newcommand{\thesisid}{B01037764}
+\newcommand{\thesisdept}{School of Computing, Ulster University}
+\newcommand{\thesismodule}{COM748}
+\newcommand{\thesisdate}{\today}
+
+\title{\thesistitle}
+\author{\thesisauthor}
+\date{\thesisdate}
+
+\begin{document}
+
+% ----------------------------------------------------------------------
+% Front matter
+% ----------------------------------------------------------------------
+\pagenumbering{roman}
+
+\input{frontmatter/titlepage}
+\input{frontmatter/abstract}
+
+\tableofcontents
+\clearpage
+\listoffigures
+\clearpage
+\listoftables
+\clearpage
+
+% ----------------------------------------------------------------------
+% Main matter
+% ----------------------------------------------------------------------
+\pagenumbering{arabic}
+
+\input{chapters/01_introduction}
+\input{chapters/02_literature_review}
+\input{chapters/03_dataset}
+\input{chapters/04_data_preparation}
+\input{chapters/05_methodology}
+\input{chapters/06_evaluation_methodology}
+\input{chapters/07_results_and_discussion}
+\input{chapters/08_conclusion}
+
+% ----------------------------------------------------------------------
+% References -- IEEE numeric style
+% ----------------------------------------------------------------------
+\bibliographystyle{ieeetr}
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,41 @@
+\chapter{Data Preparation}
+\label{ch:data-preparation}
+
+\section{Guiding Principles}
+\label{sec:cleaning-principles}
+
+Cleaning health text carries a specific risk that does not apply equally to general-domain writing. A phrase that looks repetitive, overly formal, or redundant on the surface may still be carrying a clinically relevant distinction. Three principles guided the preprocessing carried out in this project. Clinically meaningful wording was preserved wherever possible rather than smoothed away for the sake of tidiness. Genuine formatting noise, such as inconsistent whitespace or duplicated rows, was removed so the model would not waste capacity learning irrelevant patterns. Every change was logged, so any cleaned example could still be traced back to its original aligned pair if a question arose later about where a problem in the data came from.
+
+\section{Procedure}
+\label{sec:cleaning-procedure}
+
+Cleaning proceeded in three stages, applied separately to the training, validation, and test splits so that the published boundaries between them were never disturbed. Whitespace was first normalised across both the complex and simplified text fields. Exact duplicate pairs, where the same complex and simplified sentence appeared more than once, were then removed. Finally, pairs with an empty complex or simplified field were dropped, and pairs falling outside a reasonable length range were flagged rather than silently deleted.
+
+Sentences shorter than three words were removed outright, since inspection showed these were almost always fragments left over from imperfect sentence segmentation rather than genuine short sentences worth training on. Sentences longer than 120 words on the complex side were flagged but kept in the dataset, since truncation at the tokenisation stage handles unusually long inputs without needing to discard the example entirely. This distinction matters. Dropping every long or unusual example would quietly narrow the kind of sentence the model ever sees during training, which would make the eventual evaluation less representative of the messier text a real deployment would actually encounter.
+
+\Cref{tab:preprocessing-log} reports the outcome of this process for each split. The training set lost only six duplicate pairs and one short fragment out of 7{,}082 candidate pairs, which suggests the underlying Cochrane-auto alignment was already reasonably clean before this project's own cleaning stage began.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Outcome of the cleaning procedure by data split.}
+    \label{tab:preprocessing-log}
+    \begin{tabular}{@{}lrrr@{}}
+        \toprule
+         & \textbf{Train} & \textbf{Validation} & \textbf{Test} \\
+        \midrule
+        Input pairs & 7{,}082 & 1{,}041 & 932 \\
+        Duplicates removed & 6 & 1 & 0 \\
+        Empty fields removed & 0 & 0 & 0 \\
+        Flagged as too short (removed) & 1 & 0 & 0 \\
+        Flagged as too long (kept) & 14 & 2 & 2 \\
+        \textbf{Output pairs} & \textbf{7{,}075} & \textbf{1{,}040} & \textbf{932} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{Why These Choices Matter}
+\label{sec:cleaning-rationale}
+
+Preprocessing decisions are easy to treat as a mechanical step that happens before the real work begins, but in a project like this one they quietly define what the model is actually being asked to learn. Truncating long sequences too aggressively would teach a model to simplify only short, simple claims and leave it unprepared for the denser sentences that are arguably the ones most in need of simplification. Leaving misaligned examples in place would teach fluent-sounding transformations that do not reliably preserve meaning. Normalising every unusual term or phrasing out of the data would push the dataset away from the real health communication problem it was built to represent.
+
+For that reason, the cleaning script used in this project writes a record of every row it removes or flags, stored alongside the processed data. When a model output later looks unexpectedly bland or oddly specific, that record makes it possible to check whether the issue originated in preprocessing rather than in the model itself, instead of guessing.

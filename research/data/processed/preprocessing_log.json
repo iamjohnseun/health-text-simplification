@@ -1,0 +1,26 @@
+{
+  "train": {
+    "input_rows": 7082,
+    "duplicates_removed": 6,
+    "empty_removed": 0,
+    "flagged_too_short": 1,
+    "flagged_too_long": 14,
+    "output_rows": 7075
+  },
+  "val": {
+    "input_rows": 1041,
+    "duplicates_removed": 1,
+    "empty_removed": 0,
+    "flagged_too_short": 0,
+    "flagged_too_long": 2,
+    "output_rows": 1040
+  },
+  "test": {
+    "input_rows": 932,
+    "duplicates_removed": 0,
+    "empty_removed": 0,
+    "flagged_too_short": 0,
+    "flagged_too_long": 2,
+    "output_rows": 932
+  }
+}

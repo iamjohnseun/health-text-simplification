@@ -1,0 +1,46 @@
+\chapter{Introduction}
+\label{ch:introduction}
+
+\section{Motivation}
+\label{sec:motivation}
+
+Most people encounter health information at the exact moment they are least equipped to parse dense writing: after a diagnosis, before a procedure, or while trying to make sense of a public health notice that affects their family. The text they are handed, whether a patient leaflet, a treatment explanation, or a summary of new research, is often written by and for people with clinical training. Long sentences, specialist vocabulary, and formal phrasing are the norm rather than the exception, even when the stated purpose of the document is to inform the public~\cite{hra2025plainlanguage,mrct2025plainlanguage}.
+
+This is not simply a matter of style. When a person cannot follow what a piece of health information is actually telling them, the consequences extend to how confidently they make decisions, whether they follow medical advice, and how much they trust the healthcare system in general. Text simplification, the task of rewriting a passage so that it is easier to read while keeping its meaning intact, offers one route to narrowing that gap. Progress in transformer-based natural language processing over the past several years has made automatic simplification a realistic option rather than a research curiosity, but taking a model built for open-domain text and pointing it at biomedical writing is not guaranteed to work. Clinical text carries a kind of precision that ordinary prose does not: a hedge like ``may reduce the risk'' is not there by accident, and a model that smooths it into ``reduces the risk'' has changed the claim, not just the wording.
+
+This project sits at that intersection. It uses Cochrane-auto, a dataset built specifically to align technical abstracts with their official plain-language counterparts, to fine-tune a small transformer model for health text simplification, and it treats the risk of losing meaning as seriously as the goal of improving readability.
+
+\section{Problem Statement}
+\label{sec:problem-statement}
+
+Public-facing health and social care information is frequently written above the reading level of the people it is meant to serve. A person handed a leaflet about a diagnosis or a treatment option may struggle to extract what it actually means for them, not because the information is unavailable, but because the sentences are long, the terminology is specialised, and the tone is more formal than the situation calls for.
+
+This dissertation investigates whether a transformer-based simplification system can rewrite that kind of text into something clearer, without stripping out the medical substance that made the original worth reading in the first place. The question matters because misunderstanding health information carries real consequences for decision-making, adherence to treatment, and access to care more broadly. Existing simplification systems already show promise on general text, but recent work suggests that biomedical and health content needs its own training data rather than a transfer from encyclopaedic or news-based corpora, since the risk of quietly distorting a clinical claim is much higher here than in most other simplification settings~\cite{bakker2024cochraneauto,zhang2020bertscore}.
+
+\section{Research Question}
+\label{sec:research-question}
+
+Can transformer-based text simplification improve the readability of public-facing health information while preserving its original meaning?
+
+\section{Aim and Objectives}
+\label{sec:aims-objectives}
+
+\subsection*{Aim}
+
+To design, implement, and evaluate a transformer-based plain-language simplification pipeline for health-related text, with particular attention to whether readability gains come at the cost of meaning.
+
+\subsection*{Objectives}
+
+\begin{enumerate}
+    \item Prepare a clean, paired dataset of complex biomedical sentences and their simplified counterparts, using Cochrane-auto as the primary source.
+    \item Implement a simple, non-learned baseline for comparison, combining rule-based sentence splitting with conservative lexical substitution.
+    \item Fine-tune a compact transformer model, T5-small, on the prepared dataset, and compare it against the same model used without fine-tuning.
+    \item Evaluate every system using readability formulas, overlap-based text generation metrics, a simplification-specific metric, and a semantic similarity measure.
+    \item Carry out a manual reading of individual outputs to check what the automatic metrics might be missing.
+    \item Discuss where the pipeline succeeds, where it fails, and what that implies for using automatic simplification in a health communication context.
+\end{enumerate}
+
+\section{Thesis Structure}
+\label{sec:thesis-structure}
+
+\Cref{ch:literature-review} reviews the text simplification literature relevant to this project, from general-domain datasets through to the biomedical resources this work is built on. \Cref{ch:dataset} describes the Cochrane-auto dataset and the exploratory analysis carried out before any modelling began. \Cref{ch:data-preparation} covers how the raw aligned data was cleaned and turned into training pairs. \Cref{ch:methodology} sets out the two baseline systems and the fine-tuning procedure used for the main model. \Cref{ch:evaluation-methodology} defines the metrics used to judge the outputs, including the formulas behind each one. \Cref{ch:results-discussion} reports the results and discusses what they mean, supported by a manual reading of individual examples. \Cref{ch:conclusion} closes with the limitations of the current work, the ethical considerations that shaped its design, and directions for extending it further.
